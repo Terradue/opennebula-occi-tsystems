@@ -1,0 +1,18 @@
+== Terradue OpenNebula <-> t-systems OCCI bridge (1.0-SNAPSHOT) ==
+
+This project aims to implement and maintain a bridge driver between OpenNebula (http://opennebula.org/)
+and the cloud provider t-systems (http://www.t-systems.com/) exposing OCCI compliant REST APIs.
+
+This page will guide the Terradue development team with setting up their environment to perform a release.
+
+== Prerequisites  ==
+
+ * Install/Configure Ruby
+
+== Configuration ==
+
+== Legals ==
+
+OpenNebula t-systems - Copyright 2011 Terradue srl
+
+This product includes software developed by OpenNebula (http://opennebula.org/).
