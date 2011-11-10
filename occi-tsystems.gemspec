@@ -26,4 +26,5 @@ spec = Gem::Specification.new do |s|
   s.homepage = "https://github.com/Terradue/opennebula-occi-tsystems"
   s.add_dependency("opennebula-occi", ">= 2.2")
   s.add_dependency("rest-client", "~> 1.6.7")
+  s.add_dependency("libxml-ruby", ">= 0.8.3")
 end
