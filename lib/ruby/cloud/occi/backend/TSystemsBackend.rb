@@ -1,7 +1,7 @@
 ##############################################################################
 #  Copyright 2011 Terradue srl
 #  
-#  Licensed under the Apache License, Version 2.0 (the "License");
+#  Licensed under the Apache License, Version 2.0 (the "License" );
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
 #  
@@ -17,15 +17,14 @@
 require 'occi/ActionDelegator'
 require 'occi/infrastructure/Compute'
 require 'rest_client'
+require 'xml'
 
 module OCCI
   module Backend
     class TSystemsBackend
       
       def initialize()
-        @computeObjects = []
-        @networkObjects = []
-        @storageObjects = []
+        client = RestClient::Resource.new( 'https://testcloud.t-systems.com' )
         
         # Register methods for actions
         delegator = OCCI::ActionDelegator.instance
@@ -34,35 +33,37 @@ module OCCI
       end     
       
       def compute_start(action, parameters, resource)
-        $log.debug("compute_start: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        $log.debug( "compute_start: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!" )
+        
+        response = client['/ZimoryManage/services/api/'].post '<TDB/>', :content_type => 'text/xml'
       end
       
       def compute_stop(action, parameters, resource)
-        $log.debug("compute_stop: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!")
+        $log.debug( "compute_stop: action [#{action}] with parameters [#{parameters}] called for resource [#{resource}]!" )
       end
       
       def create_compute_instance(computeObject)
-        @computeObjects << computeObject
+        $log.debug( "create_compute_instance: computeObject [#{computeObject}]!" )
       end
       
       def delete_compute_instance(computeObject)
-        @computeObjects.delete(computeObject)
+        $log.debug( "delete_compute_instance: computeObject [#{computeObject}]!" )
       end
       
       def create_network_instance(networkObject)
-        @networkObjects << networkObject
+        $log.debug( "create_network_instance: computeObject [#{networkObject}]!" )
       end
       
       def delete_network_instance(networkObject)
-        @networkObjects.delete(networkObject)
+        $log.debug( "delete_network_instance: computeObject [#{networkObject}]!" )
       end
       
       def create_storage_instance(storageObject)
-        @storageObjects << storageObject
+        $log.debug( "create_storage_instance: storageObject [#{storageObject}]!" )
       end
       
       def delete_storage_instance(storageObject)
-        @storageObjects.delete(storageObject)
+        $log.debug( "delete_storage_instance: storageObject [#{storageObject}]!" )
       end
       
       def get_all_vnet_ids
@@ -70,7 +71,26 @@ module OCCI
       end
       
       def get_all_image_ids
-        return []
+        begin
+          response = client['/ZimoryManage/services/api/deployments'].get
+          
+          if ( 200 != response.code )
+          {
+            $log.error( "t-systems REST service replied an invalid code: #{response.code}" )
+            return []
+          }
+          
+          parser, parser.string = XML::Parser.new, response.to_str
+          doc, ids = parser.parse, []
+          doc.find( '/deployments/deployment' ).each do |d|
+            ids << d.attributes['id']
+          end
+
+          return ids
+        rescue => e
+          $log.error( "An error occurred while get_all_image_ids: #{e}" )
+          return []
+        end
       end
       
       def print_configuration()
