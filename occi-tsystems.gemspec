@@ -24,5 +24,6 @@ spec = Gem::Specification.new do |s|
   s.author = "Simone Tripodi"
   s.email = "simone.tripodi@terradue.com"
   s.homepage = "https://github.com/Terradue/opennebula-occi-tsystems"
-  s.add_dependency('opennebula-occi', '>= 2.2')
+  s.add_dependency("opennebula-occi", ">= 2.2")
+  s.add_dependency("rest-client", "~> 1.6.7")
 end

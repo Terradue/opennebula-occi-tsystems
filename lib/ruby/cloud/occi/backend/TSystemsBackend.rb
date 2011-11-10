@@ -16,6 +16,7 @@
 
 require 'occi/ActionDelegator'
 require 'occi/infrastructure/Compute'
+require 'rest_client'
 
 module OCCI
   module Backend
