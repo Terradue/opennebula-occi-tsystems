@@ -67,7 +67,26 @@ module OCCI
       end
       
       def get_all_vnet_ids
-        return []
+        begin
+          response = client['/ZimoryManage/services/api/networks'].get
+          
+          if ( 200 != response.code )
+          {
+            $log.error( "[get_all_vnet_ids] t-systems REST service replied an invalid code: #{response.code}" )
+            return []
+          }
+          
+          parser, parser.string = XML::Parser.new, response.to_str
+          doc, ids = parser.parse, []
+          doc.find( '/￼apNetworks/network/networkId' ).each do |n|
+            ids << n.content
+          end
+
+          return ids
+        rescue => e
+          $log.error( "[get_all_vnet_ids] An error occurred while invoking the REST service: #{e}" )
+          return []
+        end
       end
       
       def get_all_image_ids
@@ -76,19 +95,19 @@ module OCCI
           
           if ( 200 != response.code )
           {
-            $log.error( "t-systems REST service replied an invalid code: #{response.code}" )
+            $log.error( "[get_all_image_ids] t-systems REST service replied an invalid code: #{response.code}" )
             return []
           }
           
           parser, parser.string = XML::Parser.new, response.to_str
           doc, ids = parser.parse, []
-          doc.find( '/deployments/deployment' ).each do |d|
-            ids << d.attributes['id']
+          doc.find( '/deployments/deployment/@id' ).each do |id|
+            ids << id.content
           end
 
           return ids
         rescue => e
-          $log.error( "An error occurred while get_all_image_ids: #{e}" )
+          $log.error( "[get_all_image_ids] An error occurred while while invoking the REST service: #{e}" )
           return []
         end
       end
